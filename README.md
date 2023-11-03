@@ -6,10 +6,9 @@ Track changes in public Telegram user data, like profiles, stories or online sta
 
 ## Installation
 
-Clone the repo from GitHub:
+Clone the repo from GitHub and install libraries:
 
 ``` bash
 git clone https://github.com/ArtemiiKravchuk/vime-telegram-tracker.git
+pip install -r requirements.txt
 ```
-
-Additionaly, you will have to install folowing libraries: `telethon`, `loguru`, `aiosqlite`
