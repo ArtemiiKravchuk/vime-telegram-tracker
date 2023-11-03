@@ -1,0 +1,3 @@
+telethon
+loguru
+aiosqlite
