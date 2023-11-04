@@ -7,13 +7,13 @@ from loguru import logger
 
 from telethon.tl.functions.users import GetFullUserRequest
 
-import modules.helpers.output as ot
+import modules.output.output as ot
 import modules.helpers.temp as tp
 
 logger = logger.opt(colors=True)
 
 
-async def main(client, data, user: int):
+async def main(client, user: int):
     """Save info about user into output (basic profile data)"""
     logger.debug("Saving info about user (basic profile data), user=<y>{}</>",
                  user)
@@ -41,7 +41,7 @@ async def main(client, data, user: int):
     prev_results = tp.get_prev_results("profile", str(u.id))
 
     if results[2:] != prev_results:
-        await ot.save_record("profile", data["output"], headers, results)
+        await ot.save_record("profile", headers, results)
         tp.save_results("profile", str(u.id), results[2:])
        
     else:

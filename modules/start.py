@@ -3,26 +3,27 @@
 from loguru import logger
 
 import modules.helpers.errorhandle as eh
+import modules.helpers.config as cn
 
 import modules.message as message
 import modules.profile as profile
 import modules.online as online
 import modules.story as story
+import modules.photo as photo
 
 logger = logger.opt(colors=True)
 
 
-async def start_static_trackers(client, data, timings) -> None:
+async def start_static_trackers(client) -> None:
     logger.trace("Starting static info trackers, timings=<y>{}</>...",
-                 timings)
+                 "[deprecated]")
 
-    for user_info in data["targets"]["users"]:
-        if timings == "standart":
-            await eh.log(client.loop.create_task(profile.main(client, data, user_info)))
-            await eh.log(client.loop.create_task(story.main(client, data, user_info)))
-        elif timings == "frequent":
-            await eh.log(client.loop.create_task(online.main(client, data, user_info)))
+    for user_info in cn.get(["targets", "users"]):
+        await eh.log(client.loop.create_task(profile.main(client, user_info)))
+        await eh.log(client.loop.create_task(story.main(client, user_info)))
+        await eh.log(client.loop.create_task(photo.main(client, user_info)))
+        await eh.log(client.loop.create_task(online.main(client, user_info)))
 
-async def start_message_handlers(client, data, event) -> None:
+async def start_message_handlers(client, event) -> None:
     logger.trace("Starting message handlers...")
-    await eh.log(message.main(client, data, event))
+    await eh.log(message.main(client, event))

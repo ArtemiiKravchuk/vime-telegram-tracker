@@ -4,12 +4,12 @@ import time
 
 from loguru import logger
 
-import modules.helpers.output as ot
+import modules.output.output as ot
 
 logger = logger.opt(colors=True)
 
 
-async def main(client, data, event):
+async def main(client, event):
     """Save info about message into output"""
     logger.debug("Saving info about message, event=<w>{}</>",
                  event)
@@ -53,4 +53,4 @@ async def main(client, data, event):
                m.forwards, m.grouped_id, fwd_from_id, reply_to_msg_id]
     logger.trace("Got results=<w>{}</>", results)
 
-    await ot.save_record("message", data["output"], headers, results)
+    await ot.save_record("message", headers, results)

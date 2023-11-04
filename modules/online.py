@@ -8,13 +8,13 @@ from loguru import logger
 
 from telethon.tl.types import UserStatusOnline
 
-import modules.helpers.output as ot
+import modules.output.output as ot
 import modules.helpers.temp as tp
 
 logger = logger.opt(colors=True)
 
 
-async def main(client, data, user: int):
+async def main(client, user: int):
     """Save info about user's inline status into output"""
     logger.debug("Saving info about user (online status), user=<y>{}</>",
                  user)
@@ -31,7 +31,7 @@ async def main(client, data, user: int):
     prev_results = tp.get_prev_results("online", str(u.id))
 
     if results[2] != prev_results:
-        await ot.save_record("online", data["output"], headers, results)
+        await ot.save_record("online", headers, results)
         tp.save_results("online", str(u.id), results[2])
        
     else:

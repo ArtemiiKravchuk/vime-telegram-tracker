@@ -7,13 +7,13 @@ from loguru import logger
 
 from telethon.tl.functions.stories import GetUserStoriesRequest
 
-import modules.helpers.output as ot
+import modules.output.output as ot
 import modules.helpers.temp as tp
 
 logger = logger.opt(colors=True)
 
 
-async def main(client, data, user: int):
+async def main(client, user: int):
     """Save info about user's stories into output"""
     logger.debug("Saving info about user (stories), user=<y>{}</>",
                  user)
@@ -22,7 +22,6 @@ async def main(client, data, user: int):
     headers = {"time": "int", "user_id": "int", "media_file": "str"}
 
     m_time = int(time.time())
-    ns_time = int(time.time_ns())
     stories = await client(GetUserStoriesRequest(
         user_id=u.id
     ))
@@ -31,16 +30,16 @@ async def main(client, data, user: int):
 
     for story in stories.stories.stories:
         story_id = story.id
-        file = await client.download_media(story.media,
-                                           file="output/media/")
-
-        results = [m_time, u.id, file]
-        logger.trace("Got results=<w>{}</>", results)
-
         prev_results = tp.get_prev_results("story", str(u.id))
 
         if prev_results is None or story_id not in prev_results:
-            await ot.save_record("story", data["output"], headers, results)
+            file_path = f"output/story/user{user}str{story_id}"
+            file = await client.download_media(story.media,
+                                               file=file_path)
+            results = [m_time, u.id, file]
+            logger.trace("Got results=<w>{}</>", results)
+
+            await ot.save_record("story", headers, results)
             tp.append_results("story", str(u.id), story_id)
            
         else:

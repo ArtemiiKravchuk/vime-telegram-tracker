@@ -12,32 +12,40 @@ from loguru import logger
 from telethon import TelegramClient, events
 
 import modules.start as st
-
-logger.debug("Retrieving info from config.json")
-with open("config.json", "r", encoding="UTF-8") as file:
-    data = json.load(file)
-
-logger.info("Configuring logging and loguru")
-logging.basicConfig(filename='logs/telethon.log', encoding='utf-8',
-                    level=logging.DEBUG)
-
-logger.remove()
-logger.add("logs/journal.log", level="TRACE", rotation="50 MB",
-           format=data["advanced"]["loguru_format"], enqueue=True)
-logger.add(sys.stderr, format=data["advanced"]["loguru_format"],
-           level="TRACE", enqueue=True)
-logger = logger.opt(colors=True)
+import modules.helpers.config as cn
+import modules.helpers.errorhandle as eh
 
 
 def signal_handler(sig, frame):
+    """Handle SIGINT signal"""
     logger.error("Got SIGINT, frame=<w>{}</>", frame)
     sys.exit(0)
 
 
-signal.signal(signal.SIGINT, signal_handler)
+def setup() -> None:
+    """Setup the program (logging, signal handlers, config)"""
+    global logger
+
+    logger.info("Configuring logging and loguru")
+    logging.basicConfig(filename='logs/telethon.log', encoding='utf-8',
+                        level=logging.DEBUG)
+
+    loguru_format = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | \
+<magenta>{elapsed.seconds}</> <level>{level: <7}</level> | <red>\
+{name}</red>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - \
+<level>{message}</level>"
+
+    logger.remove()
+    logger.add("logs/journal.log", level="TRACE", rotation="50 MB",
+               format=loguru_format, enqueue=True)
+    logger.add(sys.stderr, format=loguru_format, level="TRACE",
+               enqueue=True)
+    logger = logger.opt(colors=True)
+
+    signal.signal(signal.SIGINT, signal_handler)
 
 
-async def static_info_tracker(timings: str):
+async def static_info_tracker():
     """Start a loop for keeping track of static data (profile pics,
     bio, etc)"""
     logger.info("Starting static info tracking")
@@ -49,10 +57,10 @@ async def static_info_tracker(timings: str):
 
         logger.debug("For static info tracker, loop_counter=<y>{}</>",
                      loop_counter)
-        await st.start_static_trackers(client, data, timings)
+        await st.start_static_trackers(client)
         loop_counter += 1
 
-        sleep_time = data["static_info_tracking_timings"][f"{timings}_s"]
+        sleep_time = data["static_info_tracking"][f"sleep_time"]
         logger.trace("Sleeping <y>{}</> sec...", sleep_time)
         await asyncio.sleep(sleep_time)
 
@@ -71,17 +79,16 @@ def main() -> None:
     logger.info("Running the script by calling main()")
 
     logger.debug("Retrieving info of TG_CORE from config.json")
-    api_id = data["telegram"]["api_id"]
-    api_hash = data["telegram"]["api_hash"]
+    api_id = cn.get(["telegram", "api_id"])
+    api_hash = cn.get(["telegram", "api_hash"])
 
     logger.info("Connecting to client...")
     client = TelegramClient('sessions/client', api_id, api_hash,
                             flood_sleep_threshold=3600)
 
-    logger.debug("Defining correct event handlers")
+    logger.debug("Defining correct event handlers, starting processes")
     client.add_event_handler(new_message_handler, events.NewMessage)
-    client.loop.create_task(static_info_tracker("standart"))
-    client.loop.create_task(static_info_tracker("frequent"))
+    client.loop.create_task(static_info_tracker())
 
     logger.info(
         "Starting the client, running until disconnected...")
@@ -91,4 +98,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     logger.info('__name__ = "__main__", starting the script')
+    setup()
     main()

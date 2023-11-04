@@ -3,17 +3,14 @@
     "api_id": "",
     "api_hash": ""
   },
-  "static_info_tracking_timings": {
-    "standart_s": 1800,
-    "frequent_s": 10
+  "static_info_tracking": {
+    "sleep_time": 10
   },
   "output": [
-    {"type": "sqlite", "name": "data.db"}
+    {"type": "sqlite", "name": "data.db"},
+    {"type": "csv", "name": "csv"}
   ],
   "targets": {
     "users": []
-  },
-  "advanced": {
-    "loguru_format": "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <magenta>{process}</> <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
   }
 }
