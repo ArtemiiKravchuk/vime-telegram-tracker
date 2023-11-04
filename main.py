@@ -1,5 +1,6 @@
 """Track Telegram stats for a particular user/group/channel"""
 
+import os
 import sys
 import json
 import time
@@ -27,7 +28,9 @@ def setup() -> None:
     global logger
 
     logger.info("Configuring logging and loguru")
-    logging.basicConfig(filename='logs/telethon.log', encoding='utf-8',
+    if not os.path.exists("logs/"):
+       os.makedirs("logs/")
+    logging.basicConfig(filename='logs/libraries.log', encoding='utf-8',
                         level=logging.DEBUG)
 
     loguru_format = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | \
