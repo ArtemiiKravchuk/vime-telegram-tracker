@@ -85,6 +85,8 @@ def main() -> None:
     api_id = cn.get(["telegram", "api_id"])
     api_hash = cn.get(["telegram", "api_hash"])
 
+    if not os.path.exists("sessions/"):
+       os.makedirs("sessions/")
     logger.info("Connecting to client...")
     client = TelegramClient('sessions/client', api_id, api_hash,
                             flood_sleep_threshold=3600)
