@@ -2,6 +2,8 @@
 ![Static Badge](https://img.shields.io/badge/version-2-blue)
 ![Static Badge](https://img.shields.io/badge/python-3.10-orange)
 
+[Українська мова](https://github.com/ArtemiiKravchuk/vime-telegram-tracker/blob/main/README.ua.md)
+
 Track changes in public Telegram user data, like profiles, stories or online status
 
 ## Installation
